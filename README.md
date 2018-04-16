@@ -54,7 +54,7 @@ A few callback ideas (chaining boxes, sound-per-character, text character) are s
 ```
 
 ## Text effects
-This textbox allows for per-character effects such as (but not limited to) coloring text or making an animated rainbow. Those effects are enabled and disabled by in-text code sequences that are small and human-writable.
+This textbox allows for per-character effects such as (but not limited to) rotating characters or making them wave, coloring text or making an animated rainbow. Those effects are enabled and disabled by in-text code sequences that are small and human-writable. The system that links effects and the textbox is also user-editable to add new effects for your own projects.
 
 ## Code sequences and effects.
 
@@ -116,5 +116,6 @@ The library's pretty much functionnal and gives the barebones features as now (t
 - [ ] Implement helper classes such as a status icon or a "Press a button to continue" helper class.
 - [ ] Add more effects
 - [ ] Add more examples
+  + [ ] For tween-based character, factorize tween selection code?
 - [ ] Document the code as well as this file?
 - [ ] Unit testing. (As of now I've been using my own project and the sample as testing content but formalized unit testing would be nice to have)

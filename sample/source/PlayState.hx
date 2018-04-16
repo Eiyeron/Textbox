@@ -51,13 +51,13 @@ class PlayState extends FlxState
 		var settingsTbox2:Settings =
 		{
 			font: FlxAssets.FONT_DEFAULT,
-			fontSize: 10,
+			fontSize: 12,
 			textFieldWidth: 400,
 			charactersPerSecond: 30,
 			color: FlxColor.YELLOW
 		};
 		tbox2 = new Textbox(30,150, settingsTbox2);
-		tbox2.setText("This is another textbox, to show how the settings variables can change the result. Speed, size or color and more with the effects! Note that there is a fully working text wrap! :D");
+		tbox2.setText("This is @021014010another@020 textbox, to show how the settings variables can change the result. Speed, size or color and @031023820more with the effects@030! Note that there is a fully working text wrap! :D");
 		tbox2.characterDisplayCallback = function(t:textbox.Text):Void
 		{
 			cursor.x = t.x + t.width + 2;
