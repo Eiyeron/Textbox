@@ -18,21 +18,18 @@ class ColorEffect implements IEffect
         color.blue = arg3;
     }
 
-    public function setActive(active:Bool):Void
-    {
-        this.active = active;
-    }
-
-
     public function update(elapsed:Float):Void
     {
     }
 
     public function apply(text:Text):Void
     {
-        if(!isActive())
-            return;
-            text.color = color;
+        text.color = color;
+    }
+
+    public function setActive(active:Bool):Void
+    {
+        this.active = active;
     }
 
     public function isActive():Bool

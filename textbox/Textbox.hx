@@ -361,7 +361,10 @@ class Textbox extends FlxSpriteGroup {
 				var characterEffect = new_character.effects[effect.command];
 				characterEffect.reset(effect.arg1,effect.arg2,effect.arg3, 0);
                 characterEffect.setActive(effect.activated);
-				characterEffect.apply(new_character);
+                if (effect.activated)
+                {
+				    characterEffect.apply(new_character);
+                }
 			}
 
 			// This line is only for the opacity tweens to work.
