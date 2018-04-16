@@ -43,14 +43,15 @@ A few callback ideas (chaining boxes, sound-per-character, text character) are s
 - `characterDisplayCallback (textbox.Text)` : This callback is added each time a character is added to the box. Use this if you need features like an audio sample played for every character, a text cursor following the input, etc etc...
 
 ### Settings object
-typedef Settings = {
-    font:String,
-    fontSize: Int,
-    textFieldWidth:Float,
-    color: FlxColor,
-    ?numLines:Int, // Default is currently 3
-    ?charactersPerSecond:Float, // Default is currently 24
-};
+(Check for textbox/Settings.hx to see what kind of parametters you can override.)
+```haxe
+  font:String             // Font location, default = HXFlixel's default font
+  fontSize:Int            // default = 12
+  textFieldWidth:Float    // default = 240px
+  color:FlxColor          // default = White
+  numLines:Int            // How many lines the textbox will display, default = 3
+  charactersPerSecond:Int // default = 24
+```
 
 ## Text effects
 This textbox allows for per-character effects such as (but not limited to) coloring text or making an animated rainbow. Those effects are enabled and disabled by in-text code sequences that are small and human-writable.
