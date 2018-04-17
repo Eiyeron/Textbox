@@ -1,9 +1,9 @@
 # Changelog
 
-## Next version
+## 0.0.2 - 2018-04-17
 ### Changed
 - Textbox's `advanceCharacter` function has been cleaned.
-- General Textbox codestyle cleaning.
+- General codestyle cleaning.
 - Factorized the demo sample to make callback plugin class examples.
 ### Fixed
 - Newline in the textbox's last line would make the textbox perpetually stuck on the newline.
