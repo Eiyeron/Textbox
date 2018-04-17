@@ -1,6 +1,8 @@
 # A Haxeflixel unnamed textbox library
+**NOTE** : Even though the API shouldn't change a lot for now, this project is still a bit in WIP.
 
 ![Demo](readme_files/demo.gif)
+
 
 ## Features
 - "Character-per-character"-style textbox for [Haxeflixel](https://haxeflixel.com/).
@@ -37,10 +39,12 @@ Callbacks are useful as they allow you to extend the textbox without touching it
 
 A few callback ideas (chaining boxes, sound-per-character, text character) are shown in the given sample project.
 
-- `statusChangeCallback (Status)` : if the textbox's state changes, this callback is called. Here a list of the expected behavior to be notifed of:
+- `statusChangeCallbacks (Status)` : if the textbox's state changes, this callback is called. Here a list of the expected behavior to be notifed of:
   + `FULL` : the textbox is full. Coupled with `continueWriting` you can make stuff like waiting a button press to resume writing.
   + `DONE` : the textbox finished writing its content. You can `dismiss` it or set it with new text.
-- `characterDisplayCallback (textbox.Text)` : This callback is added each time a character is added to the box. Use this if you need features like an audio sample played for every character, a text cursor following the input, etc etc...
+- `characterDisplayCallbacks (textbox.Text)` : This callback is added each time a character is added to the box. Use this if you need features like an audio sample played for every character, a text cursor following the input, etc etc...
+
+Those textbox callback facilities are just callback arrays, to add or remove your own callback, just use `push` or `pop` on those members.
 
 ### Settings object
 (Check for textbox/Settings.hx to see what kind of parametters you can override.)
