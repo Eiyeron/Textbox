@@ -12,24 +12,86 @@ import flixel.system.FlxSound;
 import textbox.Textbox;
 import textbox.Settings;
 
+// Those two demo classes are both an example of how you could make classes to
+// modularize plugin features on the textbox and a structure idea to
+// eventually make a helper class and/or interface to do so.
+
+class DemoTextCursor extends FlxSprite
+{
+	public override function new(X:Float, Y:Float)
+	{
+		super(X, Y);
+		makeGraphic(8, 4);
+
+		ownCharacterCallback = function(character:textbox.Text)
+		{
+			characterCallbackInternal(character);
+		};
+	}
+
+
+	public function attachToTextbox(textbox:Textbox)
+	{
+		textbox.characterDisplayCallbacks.push(ownCharacterCallback);
+	}
+
+	public function detachFromTextbox(textbox:Textbox)
+	{
+		textbox.characterDisplayCallbacks.remove(ownCharacterCallback);
+	}
+
+	private function characterCallbackInternal(character:textbox.Text)
+	{
+		x = character.x + character.width + 2;
+		y = character.y + character.height - 4;
+		color = character.color;
+	}
+
+	private var ownCharacterCallback:textbox.Text->Void = null;
+}
+
+class DemoPlaySoundOnCharacter
+{
+	public function new(soundAsset:flixel.system.FlxAssets.FlxSoundAsset)
+	{
+		sound = new FlxSound();
+		sound.loadEmbedded(soundAsset);
+
+		ownCharacterCallback = function(character:textbox.Text)
+		{
+			sound.play(true);
+		};
+	}
+
+	public function attachToTextbox(textbox:Textbox)
+	{
+		textbox.characterDisplayCallbacks.push(ownCharacterCallback);
+	}
+
+	public function detachFromTextbox(textbox:Textbox)
+	{
+		textbox.characterDisplayCallbacks.remove(ownCharacterCallback);
+	}
+
+	private var sound:FlxSound;
+	private var ownCharacterCallback:textbox.Text->Void = null;
+}
+
 class PlayState extends FlxState
 {
 
 	var tbox:Textbox;
 	var tbox2:Textbox;
-	var cursor:FlxSprite;
+	var cursor:DemoTextCursor;
 	var cursorTween:FlxTween;
-	var beep1:FlxSound;
-	var beep2:FlxSound;
+	var beep1:DemoPlaySoundOnCharacter;
+	var beep2:DemoPlaySoundOnCharacter;
 	override public function create():Void
 	{
 
-		cursor = new FlxSprite(0, 0);
-		cursor.makeGraphic(8, 4);
-		beep1 = new FlxSound();
-		beep1.loadEmbedded(AssetPaths.beep1__ogg);
-		beep2 = new FlxSound();
-		beep2.loadEmbedded(AssetPaths.beep2__ogg);
+		cursor = new DemoTextCursor(0, 0);
+		beep1 = new DemoPlaySoundOnCharacter(AssetPaths.beep1__ogg);
+		beep2 = new DemoPlaySoundOnCharacter(AssetPaths.beep2__ogg);
 		var settingsTbox:Settings =
 		{
 			font: FlxAssets.FONT_DEFAULT,
@@ -39,13 +101,8 @@ class PlayState extends FlxState
 		};
 		tbox = new Textbox(200,30, settingsTbox);
 		tbox.setText("Hello World!@011001500 How goes? @010@001FF0000Color test!@000 This is a good old textbox test.");
-		tbox.characterDisplayCallbacks.push(function(t:textbox.Text):Void
-		{
-			cursor.x = t.x + t.width + 2;
-			cursor.y = t.y + t.height - 4;
-			cursor.color = t.color;
-			beep1.play(true);
-		});
+		cursor.attachToTextbox(tbox);
+		beep1.attachToTextbox(tbox);
 		tbox.bring();
 
 		var settingsTbox2:Settings =
@@ -59,13 +116,7 @@ class PlayState extends FlxState
 		};
 		tbox2 = new Textbox(30,150, settingsTbox2);
 		tbox2.setText("This is @021014010another@020 textbox, to show how the settings variables can change the result. Speed, size or color and @031023820more with the effects@030! Note that there is a fully working text wrap! :D");
-		tbox2.characterDisplayCallbacks.push(function(t:textbox.Text):Void
-		{
-			cursor.x = t.x + t.width + 2;
-			cursor.y = t.y + t.height - 4;
-			cursor.color = t.color;
-			beep2.play(true);
-		});
+		beep2.attachToTextbox(tbox2);
 		tbox2.statusChangeCallbacks.push(function(s:textbox.Status):Void
 		{
 			if (s == textbox.Status.DONE)
@@ -90,6 +141,8 @@ class PlayState extends FlxState
 			else if(newStatus == textbox.Status.DONE)
 			{
 				add(tbox2);
+				cursor.detachFromTextbox(tbox);
+				cursor.attachToTextbox(tbox2);
 				tbox2.bring();
 			}
 		});
