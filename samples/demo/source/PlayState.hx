@@ -54,6 +54,7 @@ class PlayState extends FlxState
 			fontSize: 12,
 			textFieldWidth: 400,
 			charactersPerSecond: 30,
+			numLines: 4,
 			color: FlxColor.YELLOW
 		};
 		tbox2 = new Textbox(30,150, settingsTbox2);
@@ -69,10 +70,12 @@ class PlayState extends FlxState
 		{
 			if (s == textbox.Status.DONE)
 			{
-				cursorTween = FlxTween.color(cursor, 0.5, cursor.color, FlxColor.TRANSPARENT, {
-					type: FlxTween.PINGPONG,
-					ease: FlxEase.cubeInOut
-				});
+				cursorTween = FlxTween.color(cursor, 0.5, cursor.color, FlxColor.TRANSPARENT,
+					{
+						type: FlxTween.PINGPONG,
+						ease: FlxEase.cubeInOut
+					}
+				);
 			}
 		});
 		add(cursor);

@@ -30,7 +30,7 @@ typedef StatusChangeCallback = Status -> Void;
 typedef CharacterDisplayCallback = Text -> Void;
 
 /**
- * 	The holy mother of the textboxes.
+ * 	The holy mother of textboxes.
  *  Accepts text with tokens to enable and disable per-character effects.
  *  Accept a settings structure to customize the basic behavior (such as font options or text speed.)
  * 	The token can take two shapes
@@ -84,14 +84,15 @@ class Textbox extends FlxSpriteGroup {
 		if(willResume)
 		{
 			if(status == FULL)
+			{
 				moveTextUp();
+			}
 			status = WRITING;
 			willResume = false;
 		}
-        else if(!(status == PAUSED || status == DONE))
+        else if(status != PAUSED && status != DONE)
         {
             // Nothing to do here
-
             timerBeforeNewCharacter += elapsed;
             while(timerBeforeNewCharacter > timePerCharacter)
             {
@@ -105,7 +106,9 @@ class Textbox extends FlxSpriteGroup {
 		super.update(elapsed);
 	}
 
-	// When called, the textbox will go poof and disables itselfs from the scene.
+	/**
+	 * The textbox will be invisible and disables itselfs from the scene.
+	 */
 	public function dismiss()
 	{
 		if(!visible)
@@ -116,7 +119,10 @@ class Textbox extends FlxSpriteGroup {
 		active = false;
 	}
 
-	// When called, the textbox will come on and activates itself into the scene.
+	/**
+	 *  When called, the textbox will come on and activates itself into the scene.
+	 *  It also starts writing the parsed text, so it should be called after `setText`.
+	 */
 	public function bring()
 	{
 		startWriting();
@@ -124,7 +130,11 @@ class Textbox extends FlxSpriteGroup {
 		active = true;
 	}
 
-	// Sets a new string to the textbox and clears the shown characters.
+	/**
+	 *  Clears the current text lines and parsed sequences and parse the given text
+	 *  to set it up as the new sequence.
+	 *  @param text - New text to set
+	 */
 	public function setText(text:String)
 	{
 		for(line in lines)
@@ -143,7 +153,9 @@ class Textbox extends FlxSpriteGroup {
 
 	}
 
-	// When called, this functions sets back some variables back for starting typing again.
+	/**
+	 *  This function sets the initial state to start writing.
+	 */
 	public function startWriting()
 	{
 		currentCharacterIndex = 0;
@@ -153,7 +165,11 @@ class Textbox extends FlxSpriteGroup {
 		status = WRITING;
 	}
 
-	// Small function to ask for the rest of the text when FULL.
+	/**
+	 *  This functions asks the textbox to continue writing if it got full.
+	 *  This is manually done to allow multiple behaviors like automatic scrolling
+	 *  or waiting for user input.
+	 */
 	public function continueWriting()
 	{
 		if(status == PAUSED || status == FULL)
@@ -162,6 +178,9 @@ class Textbox extends FlxSpriteGroup {
 		}
 	}
 
+	/**
+	 *  Resets the available effects' state/parameters.
+	 */
 	function resetTextEffects()
 	{
 		for (effect in effects)
@@ -177,11 +196,15 @@ class Textbox extends FlxSpriteGroup {
 		}
 	}
 
-	//  Parses the set string and fill the character array with the possible characters and commands
+	//
+	/**
+	 *  Parses the set string and fill the character array with the possible characters and commands.
+	 *  @param text - The text to process.
+	 */
 	function prepareString(text:String)
 	{
 		characters = [];
-		var is_in_command = false;
+		var isParsingACommand = false;
 		var command:CommandValues =
 		{
 			command: 0,
@@ -190,43 +213,44 @@ class Textbox extends FlxSpriteGroup {
 			arg2: 0,
 			arg3: 0
 		};
-		var current_hex:String = "0x";
-		var in_command_step:Int = 0;
+		var currentHexString:String = "0x";
+		var commandParsingStep:Int = 0;
 
 		for(i in 0...Utf8.length(text))
 		{
 			var char_code = Utf8.charCodeAt(text, i);
-			var current_character = Utf8.sub(text, i, 1);
+			var currentCharacter = Utf8.sub(text, i, 1);
 			// If we're still parsing a command code
-			if(is_in_command)
+			if(isParsingACommand)
 			{
 				// Quick shortcut to check if the code is @@ to put @ in the text, just interrupt the parsing.
-				if(current_character == "@" && in_command_step == 0)
+				if(currentCharacter == "@" && commandParsingStep == 0)
 				{
-					is_in_command = false;
-					characters.push(current_character);
+					isParsingACommand = false;
+					characters.push(currentCharacter);
 					continue;
 				}
                 // Spacing
-                if (current_character.isSpace(0))
+                if (currentCharacter.isSpace(0))
                 {
                     continue;
                 }
 				// Continue parsing the hex code.
-				current_hex += current_character;
-				if((in_command_step == 2 && current_hex.length == 3) || current_hex.length == 4)
+				currentHexString += currentCharacter;
+				if((commandParsingStep == 2 && currentHexString.length == 3) || currentHexString.length == 4)
 				{
 					// If we parsed a pair, just put it in the correct variable.
-					var value:Null<Int> =  Std.parseInt(current_hex);
+					var value:Null<Int> =  Std.parseInt(currentHexString);
 					// Bad parsing
 					if(value == null)
 					{
-						is_in_command = false;
+						isParsingACommand = false;
 						continue;
 					}
-					switch(in_command_step)
+					switch(commandParsingStep)
 					{
-
+						// Code  | @IIvAABBCC
+						// Index |   12 4 6 8
 						case 1:
 						command.command = value;
                         case 2:
@@ -238,15 +262,14 @@ class Textbox extends FlxSpriteGroup {
 						case 8:
 						command.arg3 = value;
 					}
-					current_hex = "0x";
+					currentHexString = "0x";
 				}
-				// Go forward in the process
-				in_command_step++;
 				// And stop it if we had enough characters.
-				if(in_command_step == 9 || (in_command_step == 3 && !command.activated))
+				if(commandParsingStep == 8 || (commandParsingStep == 2 && !command.activated))
 				{
-					is_in_command = false;
+					isParsingACommand = false;
 					characters.push(command);
+					// Use a new command.
                     command =
                     {
                         command: 0,
@@ -256,30 +279,40 @@ class Textbox extends FlxSpriteGroup {
                         arg3: 0
                     };
 				}
+				else
+				{
+					// Go forward in the process
+					commandParsingStep++;
+				}
 			}
 			else
 			{
 				// Go into the hex code system if requested.
 				if(char_code == '@'.charCodeAt(0))
 				{
-					is_in_command = true;
-					in_command_step = 0;
-					current_hex = "0x";
+					isParsingACommand = true;
+					commandParsingStep = 0;
+					currentHexString = "0x";
 					command.command = 0;
 					command.activated = false;
 					command.arg1 = 0;
 					command.arg2 = 0;
 					command.arg3 = 0;
 				}
-				else{
-					characters.push(current_character);
+				else
+				{
+					characters.push(currentCharacter);
 				}
 			}
 		}
 		// Decided that the system wouldn't add a partial command code at the end of a text entry.
 	}
 
-	// This one is a helluva function but it does everything you need.
+	/**
+	 *  This function is called when the textbox has to write down a new character.
+	 *  Does *a bit* of process (like word wrapping or newline support) but makes
+	 *  stuff work.
+	 */
 	function advanceCharacter()
 	{
 		// Just avoid an access exception.
@@ -288,49 +321,54 @@ class Textbox extends FlxSpriteGroup {
 			status = DONE;
 			return;
 		}
-		var current_character = characters[currentCharacterIndex];
+		var currentCharacter = characters[currentCharacterIndex];
 
-		// If space, pre-calculate next word's length to word wrap.
-		if(!(Std.is(current_character, String) && (!cast(current_character, String).isSpace(0) || cast(current_character, String) == '\n'))){
-			// We have to build a string containing the next characters to calculate the size of the line.
-			var word:String = " ";
-			var index:Int = currentCharacterIndex+1;
-			// So, while we're finding non-invisible characters
-			while(index < characters.length)
+		var isCharacter = Std.is(currentCharacter, String);
+		// TODO : this process could eventually be split into functions.
+		if (isCharacter)
+		{
+			var currentCharacterChar = cast(currentCharacter, String);
+			// If current character is a space, let's calculate how long the next word will be.
+			if (currentCharacterChar.isSpace(0))
 			{
-				var forward_character = characters[index];
-				if(!Std.is(forward_character, String))
+				// We have to build a string containing the next characters to calculate the size of the line.
+				var word:String = " ";
+				var index:Int = currentCharacterIndex+1;
+				// So, while we're finding non-invisible characters
+				while(index < characters.length)
 				{
+					var forward_character = characters[index];
+					if(!Std.is(forward_character, String))
+					{
+						index++;
+						continue;
+					}
+					var forward_char:String = cast(characters[index], String);
+					if(!forward_char.isSpace(0))
+						word += forward_char;
+					else
+						break;
 					index++;
-					continue;
 				}
-				var forward_char:String = cast(characters[index], String);
-				if(!forward_char.isSpace(0))
-					word += forward_char;
-				else
-					break;
-				index++;
-			}
-			// TODO : please don't make words too long.
-			// SO, if we're going over the limit, just go to the next line.
-			if(lines[currentLineIndex].projectWidth(word) > settings.textFieldWidth)
-			{
-				currentCharacterIndex++;
-				if(currentLineIndex < settings.numLines-1)
+				// TODO : please don't make words too long.
+				// SO, if we're going over the limit, just go to the next line.
+				if(lines[currentLineIndex].projectWidth(word) > settings.textFieldWidth)
 				{
-					currentLineIndex++;
+					// As we wrapped the line on this character, let's skip it.
+					currentCharacterIndex++;
+					if(currentLineIndex < settings.numLines-1)
+					{
+						currentLineIndex++;
+					}
+					else
+					{
+						status = FULL;
+					}
+					return;
 				}
-				else
-				{
-					status = FULL;
-				}
-				return;
 			}
-		}
-		else if(Std.is(current_character, String)){
-			// Now, character wrap should be useless but let's keep it.
-			var char = cast(current_character, String);
-			if(char == '\n' || lines[currentLineIndex].projectWidth(current_character) > settings.textFieldWidth)
+			// inline line returns support
+			else if (currentCharacterChar == '\n')
 			{
 				if(currentLineIndex < settings.numLines-1)
 				{
@@ -341,56 +379,64 @@ class Textbox extends FlxSpriteGroup {
 					// If we're placing a newline in the last textbox's line,
 					// make the textbox advance by one character else it'd
 					// be perpetually stuck on the newline.
-					if (char == '\n')
-					{
-						currentCharacterIndex++;
-					}
+					currentCharacterIndex++;
 					status = FULL;
 					return;
 				}
 			}
-		}
+			// Character-wrap. Shouldn't be really useful but it's still a guard.
+			else if(lines[currentLineIndex].projectWidth(currentCharacter) > settings.textFieldWidth)
+			{
+				if(currentLineIndex < settings.numLines-1)
+				{
+					currentLineIndex++;
+				}
+				else
+				{
+					status = FULL;
+					return;
+				}
+			}
 
-		if(Std.is(current_character, String))
-		{
-			var char:String = cast(current_character, String);
+			// Now that the text flow control is past us, let's add the new character to the textbox.
+
 			// Get a new character from the pool
-			var new_character:Text = characterPool.get();
+			var newCharacter:Text = characterPool.get();
 			// Preparing it for the default style.
-			new_character.autoSize = true;
-			new_character.font = settings.font;
-			new_character.size = settings.fontSize;
-			new_character.text = char;
-			new_character.color = settings.color;
-			new_character.y = currentLineIndex * new_character.height;
-			new_character.x = lines[currentLineIndex].text_width;
+			newCharacter.autoSize = true;
+			newCharacter.font = settings.font;
+			newCharacter.size = settings.fontSize;
+			newCharacter.text = currentCharacterChar;
+			newCharacter.color = settings.color;
+			newCharacter.y = currentLineIndex * newCharacter.height;
+			newCharacter.x = lines[currentLineIndex].text_width;
 			for (effect in effects)
 			{
-				var characterEffect = new_character.effects[effect.command];
+				var characterEffect = newCharacter.effects[effect.command];
 				characterEffect.reset(effect.arg1,effect.arg2,effect.arg3, 0);
                 characterEffect.setActive(effect.activated);
                 if (effect.activated)
                 {
-				    characterEffect.apply(new_character);
+				    characterEffect.apply(newCharacter);
                 }
 			}
 
 			// This line is only for the opacity tweens to work.
-			new_character.alpha = alpha;
+			newCharacter.alpha = alpha;
 			// Raaaaaise from the deeead.
-			new_character.revive();
+			newCharacter.revive();
 			// Put it in the line and go forward
-			lines[currentLineIndex].push(new_character);
-			add(new_character);
+			lines[currentLineIndex].push(newCharacter);
+			add(newCharacter);
             for (callback in characterDisplayCallbacks)
             {
-                callback(new_character);
+                callback(newCharacter);
             }
 			currentCharacterIndex++;
 		}
 		else
 		{
-			var command:CommandValues = cast current_character;
+			var command:CommandValues = cast currentCharacter;
 			effects[command.command] = command;
 
 			currentCharacterIndex++;
@@ -402,21 +448,21 @@ class Textbox extends FlxSpriteGroup {
 	function moveTextUp()
 	{
 		// Clearing the first line and putting its characters in the pool.
-		var characters_to_dispose = lines[0].dispose();
-		for(character in characters_to_dispose)
+		var charactersToDispose = lines[0].dispose();
+		for(character in charactersToDispose)
 		{
 			remove(character);
 			characterPool.put(character);
 		}
-		// Moving the text one line upwrads.
+		// Moving the text one line upwards.
 		for(i in 1...settings.numLines)
 		{
-			var characters_to_pass:FlxTypedGroup<Text> = lines[i].dispose();
-			for(character in characters_to_pass)
+			var charactersToGive:FlxTypedGroup<Text> = lines[i].dispose();
+			for(character in charactersToGive)
             {
 				character.y -= character.height;
 			}
-			lines[i-1].take(characters_to_pass);
+			lines[i-1].take(charactersToGive);
 		}
 		currentLineIndex = settings.numLines - 1;
 	}
