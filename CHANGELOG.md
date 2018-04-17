@@ -1,5 +1,8 @@
 # Changelog
 
+## Next version
+### Fixed
+- Newline in the textbox's last line would make the textbox perpetually stuck on the newline.
 ## 0.0.1 - 2018-04-17
 ### Added
 - Initial versioning.

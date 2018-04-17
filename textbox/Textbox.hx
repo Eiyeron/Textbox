@@ -331,12 +331,22 @@ class Textbox extends FlxSpriteGroup {
 		}
 		else if(Std.is(current_character, String)){
 			// Now, character wrap should be useless but let's keep it.
-			if(cast(current_character, String) == '\n' || lines[currentLineIndex].projectWidth(current_character) > settings.textFieldWidth)
+			var char = cast(current_character, String);
+			if(char == '\n' || lines[currentLineIndex].projectWidth(current_character) > settings.textFieldWidth)
 			{
-				if(currentLineIndex < settings.numLines-1){
+				if(currentLineIndex < settings.numLines-1)
+				{
 					currentLineIndex++;
 				}
-				else {
+				else
+				{
+					// If we're placing a newline in the last textbox's line,
+					// make the textbox advance by one character else it'd
+					// be perpetually stuck on the newline.
+					if (char == '\n')
+					{
+						currentCharacterIndex++;
+					}
 					status = FULL;
 					return;
 				}
