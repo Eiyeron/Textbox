@@ -374,9 +374,9 @@ class Textbox extends FlxSpriteGroup {
 			// Put it in the line and go forward
 			lines[currentLineIndex].push(new_character);
 			add(new_character);
-            if(characterDisplayCallback != null)
+            for (callback in characterDisplayCallbacks)
             {
-                characterDisplayCallback(new_character);
+                callback(new_character);
             }
 			currentCharacterIndex++;
 		}
@@ -414,8 +414,8 @@ class Textbox extends FlxSpriteGroup {
 	}
 
     // callbacks
-    public var characterDisplayCallback: CharacterDisplayCallback;
-    public var statusChangeCallback: StatusChangeCallback;
+    public var characterDisplayCallbacks(default, null): Array<CharacterDisplayCallback> = [];
+    public var statusChangeCallbacks(default, null): Array<StatusChangeCallback> = [];
 
 	// Variable members
 	var status(default, set):Status;
@@ -459,10 +459,13 @@ class Textbox extends FlxSpriteGroup {
 	{
         var previousStatus = this.status;
 		this.status = status;
-        if (status != previousStatus && statusChangeCallback != null)
-        {
-            statusChangeCallback(status);
-        }
+		if(status != previousStatus)
+		{
+			for (callback in statusChangeCallbacks)
+			{
+				callback(status);
+			}
+		}
 		return status;
 	}
 

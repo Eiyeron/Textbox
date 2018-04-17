@@ -39,13 +39,13 @@ class PlayState extends FlxState
 		};
 		tbox = new Textbox(200,30, settingsTbox);
 		tbox.setText("Hello World!@011001500 How goes? @010@001FF0000Color test!@000 This is a good old textbox test.");
-		tbox.characterDisplayCallback = function(t:textbox.Text):Void
+		tbox.characterDisplayCallbacks.push(function(t:textbox.Text):Void
 		{
 			cursor.x = t.x + t.width + 2;
 			cursor.y = t.y + t.height - 4;
 			cursor.color = t.color;
 			beep1.play(true);
-		};
+		});
 		tbox.bring();
 
 		var settingsTbox2:Settings =
@@ -58,14 +58,14 @@ class PlayState extends FlxState
 		};
 		tbox2 = new Textbox(30,150, settingsTbox2);
 		tbox2.setText("This is @021014010another@020 textbox, to show how the settings variables can change the result. Speed, size or color and @031023820more with the effects@030! Note that there is a fully working text wrap! :D");
-		tbox2.characterDisplayCallback = function(t:textbox.Text):Void
+		tbox2.characterDisplayCallbacks.push(function(t:textbox.Text):Void
 		{
 			cursor.x = t.x + t.width + 2;
 			cursor.y = t.y + t.height - 4;
 			cursor.color = t.color;
 			beep2.play(true);
-		};
-		tbox2.statusChangeCallback = function(s:textbox.Status):Void
+		});
+		tbox2.statusChangeCallbacks.push(function(s:textbox.Status):Void
 		{
 			if (s == textbox.Status.DONE)
 			{
@@ -74,11 +74,11 @@ class PlayState extends FlxState
 					ease: FlxEase.cubeInOut
 				});
 			}
-		};
+		});
 		add(cursor);
 
 
-		tbox.statusChangeCallback = function (newStatus:textbox.Status):Void
+		tbox.statusChangeCallbacks.push(function (newStatus:textbox.Status):Void
 		{
 			if (newStatus == textbox.Status.FULL)
 			{
@@ -89,7 +89,7 @@ class PlayState extends FlxState
 				add(tbox2);
 				tbox2.bring();
 			}
-		};
+		});
 		add(tbox);
 
 		super.create();

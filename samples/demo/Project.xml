@@ -2,7 +2,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="FlxProject" file="FlxProject" main="Main" version="0.0.1" company="HaxeFlixel" />
+	<app title="TextboxDemo" file="TextboxDemo" main="Main" version="0.0.1" company="Eiyeron" />
 
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
 		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
@@ -29,7 +29,7 @@
 
 	<set name="BUILD_DIR" value="export" />
 	<classpath name="source" />
-	<classpath name=".." />
+	<classpath name="../.." />
 	<assets path="assets" />
 
 	<!-- _______________________________ Libraries ______________________________ -->
