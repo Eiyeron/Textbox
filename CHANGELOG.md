@@ -3,6 +3,7 @@
 ## Next version
 ### Fixed
 - Newline in the textbox's last line would make the textbox perpetually stuck on the newline.
+- Using isSpace instead of a comparison against the space character
 ## 0.0.1 - 2018-04-17
 ### Added
 - Initial versioning.

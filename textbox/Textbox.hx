@@ -112,7 +112,6 @@ class Textbox extends FlxSpriteGroup {
 		{
 			return;
 		}
-		// TODO : add a tween hook.
 		visible = false;
 		active = false;
 	}
@@ -120,8 +119,6 @@ class Textbox extends FlxSpriteGroup {
 	// When called, the textbox will come on and activates itself into the scene.
 	public function bring()
 	{
-
-		// TODO : add a tween hook.
 		startWriting();
 		visible = true;
 		active = true;
@@ -211,8 +208,7 @@ class Textbox extends FlxSpriteGroup {
 					continue;
 				}
                 // Spacing
-				// TODO : find a better way to determine if it's a space character than only that character
-                if (current_character == " ")
+                if (current_character.isSpace(0))
                 {
                     continue;
                 }
@@ -315,15 +311,17 @@ class Textbox extends FlxSpriteGroup {
 					break;
 				index++;
 			}
-			// TODO : please don't make bigass words
+			// TODO : please don't make words too long.
 			// SO, if we're going over the limit, just go to the next line.
 			if(lines[currentLineIndex].projectWidth(word) > settings.textFieldWidth)
 			{
 				currentCharacterIndex++;
-				if(currentLineIndex < settings.numLines-1){
+				if(currentLineIndex < settings.numLines-1)
+				{
 					currentLineIndex++;
 				}
-				else {
+				else
+				{
 					status = FULL;
 				}
 				return;
