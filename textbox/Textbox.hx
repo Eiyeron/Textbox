@@ -92,7 +92,6 @@ class Textbox extends FlxSpriteGroup {
 		}
         else if(status != PAUSED && status != DONE)
         {
-            // Nothing to do here
             timerBeforeNewCharacter += elapsed;
             while(timerBeforeNewCharacter > timePerCharacter)
             {
@@ -526,7 +525,9 @@ class Textbox extends FlxSpriteGroup {
 	public override function set_alpha(Alpha:Float):Float
     {
 		for(line in lines)
+		{
 			line.characters.forEach(function(s){s.set_alpha(Alpha);});
+		}
 		return super.set_alpha(Alpha);
 	}
 

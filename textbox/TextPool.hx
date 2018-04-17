@@ -4,15 +4,6 @@ import flixel.util.FlxDestroyUtil;
 
 class TextPool implements IFlxPool<Text>
 {
-	public var length(get, never):Int;
-
-	private var _pool:Array<Text> = [];
-
-	/**
-	 * Objects aren't actually removed from the array in order to improve performance.
-	 * _count keeps track of the valid, accessible pool objects.
-	 */
-	private var _count:Int = 0;
 
 	public function new()
 	{
@@ -38,7 +29,7 @@ class TextPool implements IFlxPool<Text>
 			// if the object's spot in the pool was overwritten, or if it's at or past _count (in the inaccessible zone)
 			if (i == -1 || i >= _count)
 			{
-				// Make the character invisible and not updated instead of destroying the shit out of it.
+				// Make the character invisible and not updated instead of destroying it.
 				obj.kill();
 				_pool[_count++] = obj;
 			}
@@ -49,7 +40,7 @@ class TextPool implements IFlxPool<Text>
 	{
 		if (obj != null)
 		{
-			// Make the character invisible and not updated instead of destroying the shit out of it.
+			// Make the character invisible and not updated instead of destroying it.
 			obj.kill();
 			_pool[_count++] = obj;
 		}
@@ -75,6 +66,16 @@ class TextPool implements IFlxPool<Text>
 	{
 		return _count;
 	}
+
+	public var length(get, never):Int;
+
+	private var _pool:Array<Text> = [];
+
+	/**
+	 * Objects aren't actually removed from the array in order to improve performance.
+	 * _count keeps track of the valid, accessible pool objects.
+	 */
+	private var _count:Int = 0;
 }
 
 interface IFlxPooled extends IFlxDestroyable
