@@ -118,8 +118,8 @@ To add an effect to the effect list, you have to create a class implementing `IE
 
 ## Roadmap
 The library's pretty much functionnal and gives the barebones features as now (the current effects comes from my dead project as freebies). Here's a non-exhaustive list of what could be added or changed to make the users' life easier :
-- [ ] Change the callback types into arrays or a class that acts a bit like C#'s delegates.
-- [ ] On JS, there is a quirk on how to calculate a space's width and a magic cookie is used instead. Maybe make this variable part of the settings class.
+- [X] Change the callback types into arrays or a class that acts a bit like C#'s delegates.
+- [X] On JS, there is a quirk on how to calculate a space's width and a magic cookie is used instead. Maybe make this variable part of the settings class.
 - [ ] Implement helper classes such as a status icon or a "Press a button to continue" helper class.
 - [ ] Add more effects
 - [ ] Add more examples
