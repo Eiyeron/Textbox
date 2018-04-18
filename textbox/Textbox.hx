@@ -408,7 +408,7 @@ class Textbox extends FlxSpriteGroup {
 			newCharacter.text = currentCharacterChar;
 			newCharacter.color = settings.color;
 			newCharacter.y = currentLineIndex * newCharacter.height;
-			newCharacter.x = lines[currentLineIndex].text_width;
+			newCharacter.x = lines[currentLineIndex].textWidth;
 			for (effect in effects)
 			{
 				var characterEffect = newCharacter.effects[effect.command];

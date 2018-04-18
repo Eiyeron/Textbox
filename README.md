@@ -13,6 +13,9 @@
 
 ## Usage
 
+### Known issues or quirks
+- On HTML5 we have to deal with an incorrect dimension report for space characters, thus letter spacing and space size are incorrect. Thus there is a magic cookie used in TextboxLine (search for "magic cookie") that should be tweaked to fit your preferences.
+
 ### Installation
 Include the library's root folder as classpath in your project node. Something like (as 2018-04-16)
 ```xml
@@ -116,7 +119,7 @@ To add an effect to the effect list, you have to create a class implementing `IE
 ## Roadmap
 The library's pretty much functionnal and gives the barebones features as now (the current effects comes from my dead project as freebies). Here's a non-exhaustive list of what could be added or changed to make the users' life easier :
 - [ ] Change the callback types into arrays or a class that acts a bit like C#'s delegates.
-- [ ] On JS, there is a quirk on how to calculate a space's width and a custom value is set instead. Maybe make this variable part of the settings class.
+- [ ] On JS, there is a quirk on how to calculate a space's width and a magic cookie is used instead. Maybe make this variable part of the settings class.
 - [ ] Implement helper classes such as a status icon or a "Press a button to continue" helper class.
 - [ ] Add more effects
 - [ ] Add more examples

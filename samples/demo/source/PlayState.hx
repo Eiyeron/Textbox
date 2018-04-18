@@ -43,7 +43,12 @@ class DemoTextCursor extends FlxSprite
 	private function characterCallbackInternal(character:textbox.Text)
 	{
 		x = character.x + character.width + 2;
-		y = character.y + character.height - 4;
+
+		// I noted an issue : the character height is 0 if targetting javascript.
+		if (character.text != " ")
+		{
+			y = character.y + character.height - 4;
+		}
 		color = character.color;
 	}
 

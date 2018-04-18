@@ -1,5 +1,9 @@
 # Changelog
 
+## Next version
+### Fixed
+- Compilation failure when targetting html5
+- Demo sample's cursor would jump on html5 due to spaces having no height.
 ## 0.0.2 - 2018-04-17
 ### Changed
 - Textbox's `advanceCharacter` function has been cleaned.
