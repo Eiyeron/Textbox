@@ -3,6 +3,7 @@ package textbox;
 import flixel.group.FlxGroup;
 import flixel.text.FlxText;
 
+using StringTools;
 class TextBoxLine
 {
 	public function new()
@@ -24,7 +25,7 @@ class TextBoxLine
 	}
 
 	// Accepts a new character and updates its logic values like width.
-	public function push(character:Text):Void
+	public function push(character:Text, characterSpacingHack:Float):Void
 	{
 		// Regerenate the FlxText.
 		if(characters.length == 0)
@@ -37,9 +38,8 @@ class TextBoxLine
 		innerText.text += character.text;
 		#if js
 		// Legnth calculation wouldn't work properly if I haven't done this.
-		if(character.text == " ")
-			// TODO : pass this magic cookie as a setting
-			textWidth += character.width+2;
+		if(character.text.isSpace(0))
+			textWidth += character.width + characterSpacingHack;
 		else
 			textWidth = innerText.textField.textWidth;
 		#else

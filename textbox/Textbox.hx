@@ -425,7 +425,7 @@ class Textbox extends FlxSpriteGroup {
 			// Raaaaaise from the deeead.
 			newCharacter.revive();
 			// Put it in the line and go forward
-			lines[currentLineIndex].push(newCharacter);
+			lines[currentLineIndex].push(newCharacter, settings.characterSpacingHack);
 			add(newCharacter);
             for (callback in characterDisplayCallbacks)
             {

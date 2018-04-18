@@ -14,7 +14,7 @@
 ## Usage
 
 ### Known issues or quirks
-- On HTML5 we have to deal with an incorrect dimension report for space characters, thus letter spacing and space size are incorrect. Thus there is a magic cookie used in TextboxLine (search for "magic cookie") that should be tweaked to fit your preferences.
+- On HTML5 we have to deal with an incorrect dimension report for space characters, thus letter spacing and space size are incorrect. There is a character spacing hack setting to make up for it, `characterSpacingHack` in the `Settings` class.
 
 ### Installation
 Include the library's root folder as classpath in your project node. Something like (as 2018-04-16)
