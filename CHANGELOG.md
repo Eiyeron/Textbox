@@ -3,6 +3,8 @@
 ## Next version
 ### Added
 - (html5) Added `characterSpacingHack` in `Settings` to replace the magic cookie used for fixing character spacing.
+### Changed
+- Readme cleaned.
 ### Fixed
 - Compilation failure when targetting html5
 - Demo sample's cursor would jump on html5 due to spaces having no height.
