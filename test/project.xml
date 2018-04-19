@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<meta title="UnitTesting" version="1.0.0" />
+	<app file="UnitTests" main="TestMain" />
+
+	<set name="SWF_VERSION" value="11.8" />
+	<set name="BUILD_DIR" value="export" />
+
+	<source path="." />
+	<classpath name=".." />
+
+	<set name="no-custom-backend" />
+	<set name="unit-test" />
+
+	<haxelib name="munit" />
+	<haxelib name="flixel" />
+	<haxelib name="flixel-addons" />
+
+	<haxedef name="FLX_UNIT_TEST" />
+
+</project>

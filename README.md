@@ -117,6 +117,11 @@ To add an effect to the effect list, you have to create a class implementing `IE
 - `apply(Float)` : called on a character's own update function to update the character's look if needed.
 - `setActive(Bool)/isActive():Bool` : **(WIP)** implement those to correctly manage the effect's activated's state. A simple get/set is enough.
 
+### Testing
+There is a `test` folder containing tests using [munit]. Run `lime test <platform>` inside the `test` folder to test on the given platform.
+
+**NOTE** : Currently, test on JS/HTML5 platform is broken as munit fails to find a `haxe:trace` element. This is currently being looked on to see how to fix it.
+
 ## Roadmap
 The library's pretty much functionnal and gives the barebones features as now (the current effects comes from my dead project as freebies). Here's a non-exhaustive list of what could be added or changed to make the users' life easier :
 - [X] Change the callback types into arrays or a class that acts a bit like C#'s delegates.
@@ -127,4 +132,7 @@ The library's pretty much functionnal and gives the barebones features as now (t
 - [ ] Add more examples
   + [ ] For tween-based character, factorize tween selection code?
 - [ ] Document the code as well as this file?
-- [ ] Unit testing. (As of now I've been using my own project and the sample as testing content but formalized unit testing would be nice to have)
+- [ ] Unit testing *(in progress)*
+  + [ ] Fix broken unit tests on JS or swap to haxe's bundled unit test library.
+
+[munit]: https://github.com/massiveinteractive/MassiveUnit
