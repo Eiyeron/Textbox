@@ -1,6 +1,6 @@
 # Changelog
 
-## Next version
+## 0.0.3 - 2018-04-19
 ### Added
 - (html5) Added `characterSpacingHack` in `Settings` to replace the magic cookie used for fixing character spacing.
 ### Changed
