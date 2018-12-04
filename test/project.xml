@@ -9,6 +9,13 @@
 	<source path="." />
 	<classpath name=".." />
 
+	<haxedef name="FLX_NO_MOUSE" />
+	<haxedef name="FLX_NO_KEYBOARD" />
+	<haxedef name="FLX_NO_TOUCH" />
+	<haxedef name="FLX_NO_GAMEPAD" />
+	<haxedef name="FLX_NO_SOUND_TRAY" />
+
+
 	<set name="no-custom-backend" />
 	<set name="unit-test" />
 
