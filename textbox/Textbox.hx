@@ -39,6 +39,8 @@ typedef CharacterDisplayCallback = Text -> Void;
  */
 class Textbox extends FlxSpriteGroup {
 
+	private static inline var hexadecimalCharacters = "0123456789abcdefABCDEF";
+
 	public function new(X:Float, Y:Float, settings:Settings)
 	{
 		super(X, Y);
@@ -234,10 +236,25 @@ class Textbox extends FlxSpriteGroup {
                 {
                     continue;
                 }
+
 				// Continue parsing the hex code.
 				currentHexString += currentCharacter;
 				if((commandParsingStep == 2 && currentHexString.length == 3) || currentHexString.length == 4)
 				{
+					// Basic sanity check : make sure that the parsed characters are alright
+					// First character
+					
+					if (hexadecimalCharacters.indexOf(Utf8.sub(currentHexString, 2, 1)) == -1)
+					{
+						isParsingACommand = false;
+						continue;
+					} 
+					// Second character (proccessed after to avoid going out of bounds for the toggle flag)
+					if (currentHexString.length == 4 && hexadecimalCharacters.indexOf(Utf8.sub(currentHexString, 3, 1)) == -1)
+					{
+						isParsingACommand = false;
+						continue;
+					} 
 					// If we parsed a pair, just put it in the correct variable.
 					var value:Null<Int> =  Std.parseInt(currentHexString);
 					// Bad parsing
