@@ -3,7 +3,14 @@
 ## Unreleased
 ### Added
 - Unit tests for text parser.
-
+## 0.0.4 - 2018-12-04
+### Added
+### Changed
+- Switched from `FlxTween`'s tween type variables to `FlxTweenType` enumeration, avoiding deprecation messages on Haxeflixel 4.5.1+.
+- Added a few haxedef defines to avoid compiling useless chunks of Haxeflixel in tests.
+### Fixed
+- (static platforms) Parsing non-hexadecimal characters wouldn't trigger a parsing error fallback as `parseInt` returns 0 and not `null`.
+- Added a few additonal unit tests around invalid character code parsing.
 ## 0.0.3 - 2018-04-19
 ### Added
 - (html5) Added `characterSpacingHack` in `Settings` to replace the magic cookie used for fixing character spacing.
