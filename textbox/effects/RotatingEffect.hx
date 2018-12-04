@@ -1,6 +1,7 @@
 package textbox.effects;
 
 import flixel.tweens.FlxTween;
+import flixel.tweens.FlxTween.FlxTweenType;
 import flixel.tweens.FlxEase;
 import textbox.Text;
 
@@ -47,7 +48,7 @@ class RotatingEffect implements IEffect
             {rotationAngle: mappedAngle},
             mappedDuration,
             {
-                type: FlxTween.PINGPONG,
+                type: FlxTweenType.PINGPONG,
                 ease: selectedEase
             }
         );
