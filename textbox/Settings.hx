@@ -22,7 +22,7 @@ class Settings
         font:String = null,
         fontSize:Int = 12,
         textFieldWidth:Float = 240,
-        color:FlxColor = null,
+        color:FlxColor = FlxColor.WHITE,
         numLines:Int = 3,
         charactersPerSecond:Float = 24,
         // This default value has been empirically chosen to work with only the fonts
@@ -31,10 +31,9 @@ class Settings
     )
     {
         this.font = font == null ? FlxAssets.FONT_DEFAULT : font;
-        this.color = color == null ? FlxColor.WHITE : color;
-
         this.fontSize = fontSize;
         this.textFieldWidth = textFieldWidth;
+        this.color = color;
         this.numLines = numLines;
         this.charactersPerSecond = charactersPerSecond;
         this.characterSpacingHack = characterSpacingHack;

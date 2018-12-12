@@ -31,13 +31,13 @@ class PlayState extends FlxState
 	override public function create():Void
 	{
 
-		var settingsTbox:Settings =
-		{
-			font: FlxAssets.FONT_DEFAULT,
-			fontSize: 16,
-			textFieldWidth: 320,
-			color: FlxColor.WHITE
-		};
+		var settingsTbox:Settings = new Settings
+		(
+			FlxAssets.FONT_DEFAULT,
+			16,
+			320,
+			FlxColor.WHITE
+		);
 		tbox = new Textbox((FlxG.width - 320)/2,30, settingsTbox);
 		tbox.setText("This is a demo showing how to make the textbox wait for user input. Useful when you're having too much text and not a lot of space, right? :D");
 

@@ -2,7 +2,14 @@
 
 ## Unreleased
 ### Added
-- Unit tests for text parser.
+### Changed
+- Changed the internal character structure for an ADT enumeration. Nothing should visually change. It's a part of cleaning process.
+- Renamed an internal class.
+- Removed a few seemingly useless setters in textbox.
+- Removed usage of FlxTypedGroup in TextboxLine. Didn't serve a sensible goal in the end.
+- Removed a few unit test-related cruft.
+### Fixed
+- Fixed demos not compiling on static.
 ## 0.0.4 - 2018-12-04
 ### Added
 ### Changed

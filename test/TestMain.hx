@@ -37,29 +37,10 @@ class TestMain
 
 		var runner:TestRunner = new TestRunner(client);
 		runner.addResultClient(httpClient);
-		//runner.addResultClient(new HTTPClient(new JUnitReportClient()));
 
 		runner.completionHandler = completionHandler;
 
-		#if (js && !nodejs)
-		var seconds = 0; // edit here to add some startup delay
-		function delayStartup()
-		{
-			if (seconds > 0) {
-				seconds--;
-				js.Browser.document.getElementById("munit").innerHTML =
-					"Tests will start in " + seconds + "s...";
-				haxe.Timer.delay(delayStartup, 1000);
-			}
-			else {
-				js.Browser.document.getElementById("munit").innerHTML = "";
-				runner.run(suites);
-			}
-		}
-		delayStartup();
-		#else
 		runner.run(suites);
-		#end
 	}
 
 	/**

@@ -5,6 +5,7 @@ import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
+import flixel.tweens.FlxTween.FlxTweenType;
 import flixel.tweens.FlxEase;
 import flixel.system.FlxAssets;
 import flixel.system.FlxSound;
@@ -97,28 +98,27 @@ class PlayState extends FlxState
 		cursor = new DemoTextCursor(0, 0);
 		beep1 = new DemoPlaySoundOnCharacter(AssetPaths.beep1__ogg);
 		beep2 = new DemoPlaySoundOnCharacter(AssetPaths.beep2__ogg);
-		var settingsTbox:Settings =
-		{
-			font: FlxAssets.FONT_DEFAULT,
-			fontSize: 16,
-			textFieldWidth: 320,
-			color: FlxColor.WHITE
-		};
+		var settingsTbox:Settings = new Settings(
+			FlxAssets.FONT_DEFAULT,
+			16,
+			320,
+			FlxColor.WHITE
+		);
 		tbox = new Textbox(200,30, settingsTbox);
 		tbox.setText("Hello World!@011001500 How goes? @010@001FF0000Color test!@000 This is a good old textbox test.");
 		cursor.attachToTextbox(tbox);
 		beep1.attachToTextbox(tbox);
 		tbox.bring();
 
-		var settingsTbox2:Settings =
-		{
-			font: FlxAssets.FONT_DEFAULT,
-			fontSize: 12,
-			textFieldWidth: 400,
-			charactersPerSecond: 30,
-			numLines: 4,
-			color: FlxColor.YELLOW
-		};
+		var settingsTbox2:Settings = new Settings
+		(
+			FlxAssets.FONT_DEFAULT,
+			12,
+			400,
+			30,
+			4,
+			FlxColor.YELLOW
+		);
 		tbox2 = new Textbox(30,150, settingsTbox2);
 		tbox2.setText("This is @021014010another@020 textbox, to show how the settings variables can change the result. Speed, size or color and @031023820more with the effects@030! Note that there is a fully working text wrap! :D");
 		beep2.attachToTextbox(tbox2);
@@ -128,7 +128,7 @@ class PlayState extends FlxState
 			{
 				cursorTween = FlxTween.color(cursor, 0.5, cursor.color, FlxColor.TRANSPARENT,
 					{
-						type: FlxTween.PINGPONG,
+						type: FlxTweenType.PINGPONG,
 						ease: FlxEase.cubeInOut
 					}
 				);

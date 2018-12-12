@@ -20,7 +20,7 @@ enum Status
     DONE;
 }
 
-enum TextboxCharacter
+enum CharacterType
 {
 	Character(character:String);
 	Command(command:CommandValues);
@@ -232,7 +232,7 @@ class Textbox extends FlxSpriteGroup {
 				if(currentCharacter == "@" && commandParsingStep == 0)
 				{
 					isParsingACommand = false;
-					characters.push(TextboxCharacter.Character(currentCharacter));
+					characters.push(CharacterType.Character(currentCharacter));
 					continue;
 				}
                 // Spacing
@@ -288,7 +288,7 @@ class Textbox extends FlxSpriteGroup {
 				if(commandParsingStep == 8 || (commandParsingStep == 2 && !command.activated))
 				{
 					isParsingACommand = false;
-					characters.push(TextboxCharacter.Command(command));
+					characters.push(CharacterType.Command(command));
 					// Use a new command.
                     command =
                     {
@@ -321,7 +321,7 @@ class Textbox extends FlxSpriteGroup {
 				}
 				else
 				{
-					characters.push(TextboxCharacter.Character(currentCharacter));
+					characters.push(CharacterType.Character(currentCharacter));
 				}
 			}
 		}
@@ -351,7 +351,8 @@ class Textbox extends FlxSpriteGroup {
 				if (currentCharacterChar.isSpace(0))
 				{
 					// We have to build a string containing the next characters to calculate the size of the line.
-					var word:String = " ";
+					var wordBuilder:StringBuf = new StringBuf();
+					wordBuilder.add(" ");
 					var index:Int = currentCharacterIndex+1;
 					// So, while we're finding non-invisible characters
 					while(index < characters.length)
@@ -359,18 +360,19 @@ class Textbox extends FlxSpriteGroup {
 						var forward_character = characters[index];
 						switch characters[index]
 						{
-							case TextboxCharacter.Command(command):
+							case CharacterType.Command(command):
 								index++;
 								continue;
-							case TextboxCharacter.Character(forward_char):
-								if(!forward_char.isSpace(0))
-									word += forward_char;
+							case CharacterType.Character(forward_char):
+								if(forward_char.isSpace(0))
+									wordBuilder.add(forward_char);
 								else
 									break;							
 						}
 
 						index++;
 					}
+					var word:String = wordBuilder.toString();
 					// TODO : please don't make words too long.
 					// SO, if we're going over the limit, just go to the next line.
 					if(lines[currentLineIndex].projectWidth(word) > settings.textFieldWidth)
@@ -478,7 +480,7 @@ class Textbox extends FlxSpriteGroup {
 		// Moving the text one line upwards.
 		for(i in 1...settings.numLines)
 		{
-			var charactersToGive:FlxTypedGroup<Text> = lines[i].dispose();
+			var charactersToGive = lines[i].dispose();
 			for(character in charactersToGive)
             {
 				character.y -= character.height;
@@ -500,7 +502,7 @@ class Textbox extends FlxSpriteGroup {
 
 	// internal
 	// The character array. Calculated from a sent string, it contains the list of characters to show or commands to execute.
-	var characters:Array<TextboxCharacter>;
+	var characters:Array<CharacterType>;
 	var timePerCharacter(get, never):Float;
 	// The position among the whole character array.
 	var currentCharacterIndex:Int;
@@ -529,7 +531,7 @@ class Textbox extends FlxSpriteGroup {
 		return 1./settings.charactersPerSecond;
 	}
 
-	// Small helper to manage the status_icon.
+	// Small helper to determine if the status change callbacks must be called.
 	function set_status(status:Status)
 	{
         var previousStatus = this.status;
@@ -542,29 +544,5 @@ class Textbox extends FlxSpriteGroup {
 			}
 		}
 		return status;
-	}
-
-	public override function set_alpha(Alpha:Float):Float
-    {
-		for(line in lines)
-		{
-			line.characters.forEach(function(s){s.set_alpha(Alpha);});
-		}
-		return super.set_alpha(Alpha);
-	}
-
-// Why do I need to do this...
-	public override function set_visible(Visible:Bool):Bool
-    {
-		visible = Visible;
-		group.set_visible(true);
-		return visible;
-	}
-
-	public override function set_active(Active:Bool):Bool
-    {
-		active = Active;
-		group.set_active(true);
-		return active;
 	}
 }

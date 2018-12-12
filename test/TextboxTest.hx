@@ -6,7 +6,7 @@ import massive.munit.async.AsyncFactory;
 
 import haxe.Utf8;
 import textbox.CommandValues;
-import textbox.Textbox.TextboxCharacter;
+import textbox.Textbox.CharacterType;
 import textbox.Settings;
 import wrappers.Textbox;
 
@@ -190,12 +190,12 @@ class TextboxTest
 	}
 
 	// Small helpers
-	function matchSequences(expected:CommandValues, actual:TextboxCharacter)
+	function matchSequences(expected:CommandValues, actual:CharacterType)
 	{
 		switch actual {
-			case TextboxCharacter.Character(_):
+			case CharacterType.Character(_):
 				 Assert.fail("Expected a code sequence but got a character sequence.");
-			case TextboxCharacter.Command(command):
+			case CharacterType.Command(command):
 				Assert.areEqual(expected.command, command.command, haxe.CallStack.toString(haxe.CallStack.callStack()));
 				Assert.areEqual(expected.activated, command.activated);
 				Assert.areEqual(expected.arg1, command.arg1);
@@ -204,14 +204,14 @@ class TextboxTest
 		}
 	}
 
-	function matchTextAgainstCharacters(expectedText:String, characters:Array<TextboxCharacter>)
+	function matchTextAgainstCharacters(expectedText:String, characters:Array<CharacterType>)
 	{
 		for (i in 0...Utf8.length(expectedText))
 		{
 			switch characters[i] {
-				case TextboxCharacter.Command(command):
+				case CharacterType.Command(command):
 				 Assert.fail("Expected a character sequence but got a code sequence");
-				 case TextboxCharacter.Character(character):
+				 case CharacterType.Character(character):
 				 Assert.areEqual(Utf8.sub(expectedText, i, 1), character);
 			}
 		}

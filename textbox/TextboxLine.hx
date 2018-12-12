@@ -1,6 +1,5 @@
 package textbox;
 
-import flixel.group.FlxGroup;
 import flixel.text.FlxText;
 
 using StringTools;
@@ -8,7 +7,7 @@ class TextBoxLine
 {
 	public function new()
 	{
-		characters = new FlxTypedGroup<Text>();
+		characters = new Array<Text>();
 		textWidth = 0;
 		innerText = new FlxText();
 		innerText.text = "";
@@ -34,7 +33,7 @@ class TextBoxLine
 			innerText.font = character.font;
 			innerText.size = character.size;
 		}
-		characters.add(character);
+		characters.push(character);
 		innerText.text += character.text;
 		#if js
 		// Legnth calculation wouldn't work properly if I haven't done this.
@@ -48,17 +47,17 @@ class TextBoxLine
 	}
 
 	// Releases its characters to pass along or put them back into pool.
-	public function dispose():FlxTypedGroup<Text>
+	public function dispose():Array<Text>
 	{
 		textWidth = 0;
 		var c = characters;
-		characters = new FlxTypedGroup<Text>();
+		characters = new Array<Text>();
 		innerText.text = "";
 		return c;
 	}
 
 	// Takes ownership of the characters and recalculates its metrics.
-	public function take(characters:FlxTypedGroup<Text>):Void
+	public function take(characters:Array<Text>):Void
 	{
 		this.characters = characters;
 		innerText.text = "";
@@ -69,7 +68,7 @@ class TextBoxLine
 		textWidth = innerText.width;
 	}
 
-	public var characters:FlxTypedGroup<Text>;
+	public var characters:Array<Text>;
 	public var textWidth(default, null):Float;
 	private var innerText:FlxText;
 }
