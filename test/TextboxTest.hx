@@ -37,29 +37,27 @@ class TextboxTest
 
 		Assert.areEqual(Utf8.length(text), characters.length);
 
-
 		matchTextAgainstCharacters(text, characters);
 	}
 
 	@Test
 	public function testEnableSequenceParsing()
 	{
-		var text = "@501123456";
+		var text = "@501134256";
 		tbox.setText(text);
 		var characters = tbox.getCharacters();
 
 		Assert.areEqual(1, characters.length);
-		var sequence:CommandValues = cast characters[0];
 		var expectedSequence:CommandValues =
 		{
 			command: 0x50,
 			activated: true,
-			arg1: 0x12,
-			arg2: 0x34,
+			arg1: 0x13,
+			arg2: 0x42,
 			arg3: 0x56,
 		};
 
-		matchSequences(expectedSequence, sequence);
+		matchSequences(expectedSequence, characters[0]);
 	}
 
 	@Test
@@ -70,7 +68,6 @@ class TextboxTest
 		var characters = tbox.getCharacters();
 
 		Assert.areEqual(1, characters.length);
-		var sequence:CommandValues = cast characters[0];
 		var expectedSequence:CommandValues =
 		{
 			command: 5,
@@ -79,8 +76,7 @@ class TextboxTest
 			arg2: 0,
 			arg3: 0,
 		};
-
-		matchSequences(expectedSequence, sequence);
+		matchSequences(expectedSequence, characters[0]);
 	}
 
 	@Test
@@ -194,20 +190,30 @@ class TextboxTest
 	}
 
 	// Small helpers
-	function matchSequences(expected:CommandValues, actual:CommandValues)
+	function matchSequences(expected:CommandValues, actual:TextboxCharacter)
 	{
-		Assert.areEqual(expected.command, actual.command);
-		Assert.areEqual(expected.activated, actual.activated);
-		Assert.areEqual(expected.arg1, actual.arg1);
-		Assert.areEqual(expected.arg2, actual.arg2);
-		Assert.areEqual(expected.arg3, actual.arg3);
+		switch actual {
+			case TextboxCharacter.Character(_):
+				 Assert.fail("Expected a code sequence but got a character sequence.");
+			case TextboxCharacter.Command(command):
+				Assert.areEqual(expected.command, command.command, haxe.CallStack.toString(haxe.CallStack.callStack()));
+				Assert.areEqual(expected.activated, command.activated);
+				Assert.areEqual(expected.arg1, command.arg1);
+				Assert.areEqual(expected.arg2, command.arg2);
+				Assert.areEqual(expected.arg3, command.arg3);
+		}
 	}
 
 	function matchTextAgainstCharacters(expectedText:String, characters:Array<TextboxCharacter>)
 	{
 		for (i in 0...Utf8.length(expectedText))
 		{
-			Assert.areEqual(expectedText.substr(i,1),  characters[i], 'Character "${expectedText.substr(i,1)}" at position ${i} wasn\'t found and ${characters[i]} was found instead.');
+			switch characters[i] {
+				case TextboxCharacter.Command(command):
+				 Assert.fail("Expected a character sequence but got a code sequence");
+				 case TextboxCharacter.Character(character):
+				 Assert.areEqual(Utf8.sub(expectedText, i, 1), character);
+			}
 		}
 	}
 }

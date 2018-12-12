@@ -20,7 +20,11 @@ enum Status
     DONE;
 }
 
-typedef TextboxCharacter = OneOfTwo<String, CommandValues>;
+enum TextboxCharacter
+{
+	Character(character:String);
+	Command(command:CommandValues);
+}
 
 // Callback typedefs
 
@@ -228,7 +232,7 @@ class Textbox extends FlxSpriteGroup {
 				if(currentCharacter == "@" && commandParsingStep == 0)
 				{
 					isParsingACommand = false;
-					characters.push(currentCharacter);
+					characters.push(TextboxCharacter.Character(currentCharacter));
 					continue;
 				}
                 // Spacing
@@ -284,7 +288,7 @@ class Textbox extends FlxSpriteGroup {
 				if(commandParsingStep == 8 || (commandParsingStep == 2 && !command.activated))
 				{
 					isParsingACommand = false;
-					characters.push(command);
+					characters.push(TextboxCharacter.Command(command));
 					// Use a new command.
                     command =
                     {
@@ -317,7 +321,7 @@ class Textbox extends FlxSpriteGroup {
 				}
 				else
 				{
-					characters.push(currentCharacter);
+					characters.push(TextboxCharacter.Character(currentCharacter));
 				}
 			}
 		}
@@ -337,41 +341,73 @@ class Textbox extends FlxSpriteGroup {
 			status = DONE;
 			return;
 		}
-		var currentCharacter = characters[currentCharacterIndex];
-
-		var isCharacter = Std.is(currentCharacter, String);
 		// TODO : this process could eventually be split into functions.
-		if (isCharacter)
+		switch characters[currentCharacterIndex]
 		{
-			var currentCharacterChar = cast(currentCharacter, String);
-			// If current character is a space, let's calculate how long the next word will be.
-			if (currentCharacterChar.isSpace(0))
+
+			case Character(currentCharacterChar):
 			{
-				// We have to build a string containing the next characters to calculate the size of the line.
-				var word:String = " ";
-				var index:Int = currentCharacterIndex+1;
-				// So, while we're finding non-invisible characters
-				while(index < characters.length)
+				// If current character is a space, let's calculate how long the next word will be.
+				if (currentCharacterChar.isSpace(0))
 				{
-					var forward_character = characters[index];
-					if(!Std.is(forward_character, String))
+					// We have to build a string containing the next characters to calculate the size of the line.
+					var word:String = " ";
+					var index:Int = currentCharacterIndex+1;
+					// So, while we're finding non-invisible characters
+					while(index < characters.length)
 					{
+						var forward_character = characters[index];
+						switch characters[index]
+						{
+							case TextboxCharacter.Command(command):
+								index++;
+								continue;
+							case TextboxCharacter.Character(forward_char):
+								if(!forward_char.isSpace(0))
+									word += forward_char;
+								else
+									break;							
+						}
+
 						index++;
-						continue;
 					}
-					var forward_char:String = cast(characters[index], String);
-					if(!forward_char.isSpace(0))
-						word += forward_char;
-					else
-						break;
-					index++;
+					// TODO : please don't make words too long.
+					// SO, if we're going over the limit, just go to the next line.
+					if(lines[currentLineIndex].projectWidth(word) > settings.textFieldWidth)
+					{
+						// As we wrapped the line on this character, let's skip it.
+						currentCharacterIndex++;
+						if(currentLineIndex < settings.numLines-1)
+						{
+							currentLineIndex++;
+						}
+						else
+						{
+							status = FULL;
+						}
+						return;
+					}
 				}
-				// TODO : please don't make words too long.
-				// SO, if we're going over the limit, just go to the next line.
-				if(lines[currentLineIndex].projectWidth(word) > settings.textFieldWidth)
+				// inline line returns support
+				else if (currentCharacterChar == '\n')
 				{
-					// As we wrapped the line on this character, let's skip it.
-					currentCharacterIndex++;
+					if(currentLineIndex < settings.numLines-1)
+					{
+						currentLineIndex++;
+					}
+					else
+					{
+						// If we're placing a newline in the last textbox's line,
+						// make the textbox advance by one character else it'd
+						// be perpetually stuck on the newline.
+						currentCharacterIndex++;
+						status = FULL;
+						return;
+					}
+				}
+				// Character-wrap. Shouldn't be really useful but it's still a guard.
+				else if(lines[currentLineIndex].projectWidth(currentCharacterChar) > settings.textFieldWidth)
+				{
 					if(currentLineIndex < settings.numLines-1)
 					{
 						currentLineIndex++;
@@ -379,84 +415,53 @@ class Textbox extends FlxSpriteGroup {
 					else
 					{
 						status = FULL;
+						return;
 					}
-					return;
 				}
+
+				// Now that the text flow control is past us, let's add the new character to the textbox.
+
+				// Get a new character from the pool
+				var newCharacter:Text = characterPool.get();
+				// Preparing it for the default style.
+				newCharacter.autoSize = true;
+				newCharacter.font = settings.font;
+				newCharacter.size = settings.fontSize;
+				newCharacter.text = currentCharacterChar;
+				newCharacter.color = settings.color;
+				newCharacter.y = currentLineIndex * newCharacter.height;
+				newCharacter.x = lines[currentLineIndex].textWidth;
+				for (effect in effects)
+				{
+					var characterEffect = newCharacter.effects[effect.command];
+					characterEffect.reset(effect.arg1,effect.arg2,effect.arg3, 0);
+					characterEffect.setActive(effect.activated);
+					if (effect.activated)
+					{
+						characterEffect.apply(newCharacter);
+					}
+				}
+
+				// This line is only for the opacity tweens to work.
+				newCharacter.alpha = alpha;
+				// Raaaaaise from the deeead.
+				newCharacter.revive();
+				// Put it in the line and go forward
+				lines[currentLineIndex].push(newCharacter, settings.characterSpacingHack);
+				add(newCharacter);
+				for (callback in characterDisplayCallbacks)
+				{
+					callback(newCharacter);
+				}
+				currentCharacterIndex++;
 			}
-			// inline line returns support
-			else if (currentCharacterChar == '\n')
+			case Command(command):
 			{
-				if(currentLineIndex < settings.numLines-1)
-				{
-					currentLineIndex++;
-				}
-				else
-				{
-					// If we're placing a newline in the last textbox's line,
-					// make the textbox advance by one character else it'd
-					// be perpetually stuck on the newline.
-					currentCharacterIndex++;
-					status = FULL;
-					return;
-				}
+				effects[command.command] = command;
+
+				currentCharacterIndex++;
+				timerBeforeNewCharacter += timePerCharacter;
 			}
-			// Character-wrap. Shouldn't be really useful but it's still a guard.
-			else if(lines[currentLineIndex].projectWidth(currentCharacter) > settings.textFieldWidth)
-			{
-				if(currentLineIndex < settings.numLines-1)
-				{
-					currentLineIndex++;
-				}
-				else
-				{
-					status = FULL;
-					return;
-				}
-			}
-
-			// Now that the text flow control is past us, let's add the new character to the textbox.
-
-			// Get a new character from the pool
-			var newCharacter:Text = characterPool.get();
-			// Preparing it for the default style.
-			newCharacter.autoSize = true;
-			newCharacter.font = settings.font;
-			newCharacter.size = settings.fontSize;
-			newCharacter.text = currentCharacterChar;
-			newCharacter.color = settings.color;
-			newCharacter.y = currentLineIndex * newCharacter.height;
-			newCharacter.x = lines[currentLineIndex].textWidth;
-			for (effect in effects)
-			{
-				var characterEffect = newCharacter.effects[effect.command];
-				characterEffect.reset(effect.arg1,effect.arg2,effect.arg3, 0);
-                characterEffect.setActive(effect.activated);
-                if (effect.activated)
-                {
-				    characterEffect.apply(newCharacter);
-                }
-			}
-
-			// This line is only for the opacity tweens to work.
-			newCharacter.alpha = alpha;
-			// Raaaaaise from the deeead.
-			newCharacter.revive();
-			// Put it in the line and go forward
-			lines[currentLineIndex].push(newCharacter, settings.characterSpacingHack);
-			add(newCharacter);
-            for (callback in characterDisplayCallbacks)
-            {
-                callback(newCharacter);
-            }
-			currentCharacterIndex++;
-		}
-		else
-		{
-			var command:CommandValues = cast currentCharacter;
-			effects[command.command] = command;
-
-			currentCharacterIndex++;
-			timerBeforeNewCharacter += timePerCharacter;
 		}
 	}
 
