@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.0.5 - 2018-12-14
 ### Added
 - Added MP3 samples for demo sample for flash target.
 ### Changed
