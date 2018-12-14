@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Added
+- Added MP3 samples for demo sample for flash target.
 ### Changed
 - Changed the internal character structure for an ADT enumeration. Nothing should visually change. It's a part of cleaning process.
 - Renamed an internal class.
@@ -10,6 +11,7 @@
 - Removed a few unit test-related cruft.
 ### Fixed
 - Fixed demos not compiling on static.
+- Fixed super constructor call in Textbox, blocking Flash target to compile.
 ## 0.0.4 - 2018-12-04
 ### Added
 ### Changed
