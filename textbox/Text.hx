@@ -5,9 +5,9 @@ import textbox.effects.IEffect;
 class Text extends FlxText {
 	public var effects:Array<IEffect>;
 
-	public override function new(X:Float = 0, Y:Float = 0, FieldWidth:Float = 0, ?text:String, Size:Int = 8, EmbeddedFont:Bool = true)
+	public function new(X:Float = 0, Y:Float = 0, FieldWidth:Float = 0, ?text:String, Size:Int = 8, EmbeddedFont:Bool = true)
 	{
-		super(X, Y, FieldWidth, text, EmbeddedFont);
+		super(X, Y, FieldWidth, text, Size, EmbeddedFont);
 		effects = [];
 		for (effect in TextEffectArray.effectClasses)
 		{

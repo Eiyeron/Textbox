@@ -120,6 +120,11 @@ To add an effect to the effect list, you have to create a class implementing `IE
 ### Testing
 There is a `test` folder containing tests using [munit]. Run `lime test <platform>` inside the `test` folder to test on the given platform.
 
+### Samples
+There are currently a few sample varying in complexity to show a few ways to use the textbox library.
+- Demo, which shows a few of the features the textbox has to offer through two textboxes
+- Decorating, which shows a textbox with tweening, press waiting status and a linked background. Closer to a simple ingame textbox visual.
+
 **NOTE** : Currently, test on JS/HTML5 platform is broken as munit fails to find a `haxe:trace` element. This is currently being looked on to see how to fix it.
 
 ## Roadmap

@@ -62,7 +62,6 @@ class DemoPlaySoundOnCharacter
 	{
 		sound = new FlxSound();
 		sound.loadEmbedded(soundAsset);
-
 		ownCharacterCallback = function(character:textbox.Text)
 		{
 			sound.play(true);
@@ -96,8 +95,13 @@ class PlayState extends FlxState
 	{
 
 		cursor = new DemoTextCursor(0, 0);
+		#if flash
+		beep1 = new DemoPlaySoundOnCharacter(AssetPaths.beep1__mp3);
+		beep2 = new DemoPlaySoundOnCharacter(AssetPaths.beep2__mp3);
+		#else
 		beep1 = new DemoPlaySoundOnCharacter(AssetPaths.beep1__ogg);
 		beep2 = new DemoPlaySoundOnCharacter(AssetPaths.beep2__ogg);
+		#end
 		var settingsTbox:Settings = new Settings(
 			FlxAssets.FONT_DEFAULT,
 			16,
@@ -115,9 +119,9 @@ class PlayState extends FlxState
 			FlxAssets.FONT_DEFAULT,
 			12,
 			400,
+			FlxColor.YELLOW,
 			30,
-			4,
-			FlxColor.YELLOW
+			4
 		);
 		tbox2 = new Textbox(30,150, settingsTbox2);
 		tbox2.setText("This is @021014010another@020 textbox, to show how the settings variables can change the result. Speed, size or color and @031023820more with the effects@030! Note that there is a fully working text wrap! :D");

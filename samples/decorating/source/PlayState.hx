@@ -56,7 +56,7 @@ class PlayState extends FlxState
 			}
 		});
 
-		pressSpaceIndication = new FlxText(tbox.x, 160, "", 14);
+		pressSpaceIndication = new FlxText(tbox.x, 160, 0, "", 14);
 		pressSpaceIndication.color = FlxColor.CYAN;
 		pressSpaceIndication.visible = false;
 
