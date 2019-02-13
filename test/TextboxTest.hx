@@ -17,203 +17,203 @@ import wrappers.Textbox;
  */
 class TextboxTest
 {
-	private var tbox:Textbox;
-	public function new()
-	{
-	}
+    private var tbox:Textbox;
+    public function new()
+    {
+    }
 
-	@Before
-	public function setup()
-	{
-		tbox = new Textbox(0, 0, new Settings());
-	}
+    @Before
+    public function setup()
+    {
+        tbox = new Textbox(0, 0, new Settings());
+    }
 
-	@Test
-	public function testSimpleParsing()
-	{
-		var text = "Hello world";
-		tbox.setText(text);
-		var characters = tbox.getCharacters();
+    @Test
+    public function testSimpleParsing()
+    {
+        var text = "Hello world";
+        tbox.setText(text);
+        var characters = tbox.getCharacters();
 
-		Assert.areEqual(Utf8.length(text), characters.length);
+        Assert.areEqual(Utf8.length(text), characters.length);
 
-		matchTextAgainstCharacters(text, characters);
-	}
+        matchTextAgainstCharacters(text, characters);
+    }
 
-	@Test
-	public function testEnableSequenceParsing()
-	{
-		var text = "@501134256";
-		tbox.setText(text);
-		var characters = tbox.getCharacters();
+    @Test
+    public function testEnableSequenceParsing()
+    {
+        var text = "@501134256";
+        tbox.setText(text);
+        var characters = tbox.getCharacters();
 
-		Assert.areEqual(1, characters.length);
-		var expectedSequence:CommandValues =
-		{
-			command: 0x50,
-			activated: true,
-			arg1: 0x13,
-			arg2: 0x42,
-			arg3: 0x56,
-		};
+        Assert.areEqual(1, characters.length);
+        var expectedSequence:CommandValues =
+        {
+            command: 0x50,
+            activated: true,
+            arg1: 0x13,
+            arg2: 0x42,
+            arg3: 0x56,
+        };
 
-		matchSequences(expectedSequence, characters[0]);
-	}
+        matchSequences(expectedSequence, characters[0]);
+    }
 
-	@Test
-	public function testDisableSequenceParsing()
-	{
-		var text = "@050";
-		tbox.setText(text);
-		var characters = tbox.getCharacters();
+    @Test
+    public function testDisableSequenceParsing()
+    {
+        var text = "@050";
+        tbox.setText(text);
+        var characters = tbox.getCharacters();
 
-		Assert.areEqual(1, characters.length);
-		var expectedSequence:CommandValues =
-		{
-			command: 5,
-			activated: false,
-			arg1: 0,
-			arg2: 0,
-			arg3: 0,
-		};
-		matchSequences(expectedSequence, characters[0]);
-	}
+        Assert.areEqual(1, characters.length);
+        var expectedSequence:CommandValues =
+        {
+            command: 5,
+            activated: false,
+            arg1: 0,
+            arg2: 0,
+            arg3: 0,
+        };
+        matchSequences(expectedSequence, characters[0]);
+    }
 
-	@Test
-	public function testParsingInText()
-	{
-		var prefix = "Hello ";
-		var suffix = "world!";
-		var code = "@001123456";
+    @Test
+    public function testParsingInText()
+    {
+        var prefix = "Hello ";
+        var suffix = "world!";
+        var code = "@001123456";
 
-		var prefixLength = Utf8.length(prefix);
-		var suffixLength = Utf8.length(suffix);
+        var prefixLength = Utf8.length(prefix);
+        var suffixLength = Utf8.length(suffix);
 
-		var text = prefix + code + suffix;
-		tbox.setText(text);
-		var characters = tbox.getCharacters();
+        var text = prefix + code + suffix;
+        tbox.setText(text);
+        var characters = tbox.getCharacters();
 
-		Assert.areEqual(prefixLength + suffixLength + 1, characters.length, "Length should match the prefix's plus the suffix's plus the character sequence");
+        Assert.areEqual(prefixLength + suffixLength + 1, characters.length, "Length should match the prefix's plus the suffix's plus the character sequence");
 
-		matchTextAgainstCharacters(prefix, characters.slice(0, prefixLength));
+        matchTextAgainstCharacters(prefix, characters.slice(0, prefixLength));
 
-		matchSequences
-		(
-			{
-				command: 0,
-				activated: true,
-				arg1: 0x12,
-				arg2: 0x34,
-				arg3: 0x56,
-			},
-			characters[prefixLength]
-		);
+        matchSequences
+        (
+            {
+                command: 0,
+                activated: true,
+                arg1: 0x12,
+                arg2: 0x34,
+                arg3: 0x56,
+            },
+            characters[prefixLength]
+        );
 
-		matchTextAgainstCharacters(suffix, characters.slice(prefixLength + 1, characters.length));
-	}
+        matchTextAgainstCharacters(suffix, characters.slice(prefixLength + 1, characters.length));
+    }
 
-	@Test
-	public function testInvalidSequenceParsing()
-	{
-		// As now, the parser only breaks at the end of a sequence part.
-		// Here, it stops after collecting the two characters of the command's index
-		// Hence the string resulting length is not taking both in count
-		// TODO : Fix parsing to add the collected values back into `characters` on failure.
-		// This is slightly non trivial? What to expect?
-		// Error case examples:
-		// @GG 1 00 11 22 => Stop and add nothing into the chain? Stop and add the @ into the chain?
-		// @00 D 00 11 22 => Stop and add "00 D" into the chain? 
-		// ...
-		// This also expects that the spacing and all are processed. This'll require an O(n) allocations of memory as the backtrack
-		// string goes higher and higher.
+    @Test
+    public function testInvalidSequenceParsing()
+    {
+        // As now, the parser only breaks at the end of a sequence part.
+        // Here, it stops after collecting the two characters of the command's index
+        // Hence the string resulting length is not taking both in count
+        // TODO : Fix parsing to add the collected values back into `characters` on failure.
+        // This is slightly non trivial? What to expect?
+        // Error case examples:
+        // @GG 1 00 11 22 => Stop and add nothing into the chain? Stop and add the @ into the chain?
+        // @00 D 00 11 22 => Stop and add "00 D" into the chain?
+        // ...
+        // This also expects that the spacing and all are processed. This'll require an O(n) allocations of memory as the backtrack
+        // string goes higher and higher.
 
-		// Invalid first part
-		{
-			var text = "Hello@__0001122";
-			var expectedText = "Hello0001122";
-			tbox.setText(text);
-			var characters = tbox.getCharacters();
+        // Invalid first part
+        {
+            var text = "Hello@__0001122";
+            var expectedText = "Hello0001122";
+            tbox.setText(text);
+            var characters = tbox.getCharacters();
 
-			Assert.areEqual(Utf8.length(expectedText), characters.length);
+            Assert.areEqual(Utf8.length(expectedText), characters.length);
 
-			matchTextAgainstCharacters(expectedText, characters);
-		}
+            matchTextAgainstCharacters(expectedText, characters);
+        }
 
-		// Invalid second part
-		{
-			var text = "Hello@00_001122";
-			var expectedText = "Hello001122";
-			tbox.setText(text);
-			var characters = tbox.getCharacters();
+        // Invalid second part
+        {
+            var text = "Hello@00_001122";
+            var expectedText = "Hello001122";
+            tbox.setText(text);
+            var characters = tbox.getCharacters();
 
-			Assert.areEqual(Utf8.length(expectedText), characters.length);
+            Assert.areEqual(Utf8.length(expectedText), characters.length);
 
-			matchTextAgainstCharacters(expectedText, characters);
-		}
+            matchTextAgainstCharacters(expectedText, characters);
+        }
 
-		// Invalid third part
-		{
-			var text = "Hello@001__1122";
-			var expectedText = "Hello1122";
-			tbox.setText(text);
-			var characters = tbox.getCharacters();
+        // Invalid third part
+        {
+            var text = "Hello@001__1122";
+            var expectedText = "Hello1122";
+            tbox.setText(text);
+            var characters = tbox.getCharacters();
 
-			Assert.areEqual(Utf8.length(expectedText), characters.length);
+            Assert.areEqual(Utf8.length(expectedText), characters.length);
 
-			matchTextAgainstCharacters(expectedText, characters);
-		}
+            matchTextAgainstCharacters(expectedText, characters);
+        }
 
-		// Invalid fourth part
-		{
-			var text = "Hello@00100__22";
-			var expectedText = "Hello22";
-			tbox.setText(text);
-			var characters = tbox.getCharacters();
+        // Invalid fourth part
+        {
+            var text = "Hello@00100__22";
+            var expectedText = "Hello22";
+            tbox.setText(text);
+            var characters = tbox.getCharacters();
 
-			Assert.areEqual(Utf8.length(expectedText), characters.length);
+            Assert.areEqual(Utf8.length(expectedText), characters.length);
 
-			matchTextAgainstCharacters(expectedText, characters);
-		}
+            matchTextAgainstCharacters(expectedText, characters);
+        }
 
-		// Invalid fifth part
-		{
-			var text = "Hello@0010011__";
-			var expectedText = "Hello";
-			tbox.setText(text);
-			var characters = tbox.getCharacters();
+        // Invalid fifth part
+        {
+            var text = "Hello@0010011__";
+            var expectedText = "Hello";
+            tbox.setText(text);
+            var characters = tbox.getCharacters();
 
-			Assert.areEqual(Utf8.length(expectedText), characters.length);
+            Assert.areEqual(Utf8.length(expectedText), characters.length);
 
-			matchTextAgainstCharacters(expectedText, characters);
-		}
+            matchTextAgainstCharacters(expectedText, characters);
+        }
 
-	}
+    }
 
-	// Small helpers
-	function matchSequences(expected:CommandValues, actual:CharacterType)
-	{
-		switch actual {
-			case CharacterType.Character(_):
-				 Assert.fail("Expected a code sequence but got a character sequence.");
-			case CharacterType.Command(command):
-				Assert.areEqual(expected.command, command.command, haxe.CallStack.toString(haxe.CallStack.callStack()));
-				Assert.areEqual(expected.activated, command.activated);
-				Assert.areEqual(expected.arg1, command.arg1);
-				Assert.areEqual(expected.arg2, command.arg2);
-				Assert.areEqual(expected.arg3, command.arg3);
-		}
-	}
+    // Small helpers
+    function matchSequences(expected:CommandValues, actual:CharacterType)
+    {
+        switch actual {
+            case CharacterType.Character(_):
+                 Assert.fail("Expected a code sequence but got a character sequence.");
+            case CharacterType.Command(command):
+                Assert.areEqual(expected.command, command.command, haxe.CallStack.toString(haxe.CallStack.callStack()));
+                Assert.areEqual(expected.activated, command.activated);
+                Assert.areEqual(expected.arg1, command.arg1);
+                Assert.areEqual(expected.arg2, command.arg2);
+                Assert.areEqual(expected.arg3, command.arg3);
+        }
+    }
 
-	function matchTextAgainstCharacters(expectedText:String, characters:Array<CharacterType>)
-	{
-		for (i in 0...Utf8.length(expectedText))
-		{
-			switch characters[i] {
-				case CharacterType.Command(command):
-				 Assert.fail("Expected a character sequence but got a code sequence");
-				 case CharacterType.Character(character):
-				 Assert.areEqual(Utf8.sub(expectedText, i, 1), character);
-			}
-		}
-	}
+    function matchTextAgainstCharacters(expectedText:String, characters:Array<CharacterType>)
+    {
+        for (i in 0...Utf8.length(expectedText))
+        {
+            switch characters[i] {
+                case CharacterType.Command(command):
+                 Assert.fail("Expected a character sequence but got a code sequence");
+                 case CharacterType.Character(character):
+                 Assert.areEqual(Utf8.sub(expectedText, i, 1), character);
+            }
+        }
+    }
 }

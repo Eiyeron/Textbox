@@ -2,9 +2,9 @@ package textbox;
 
 typedef CommandValues =
 {
-	command:Int,
+    command:Int,
     activated:Bool,
-	arg1:Int,
-	arg2:Int,
-	arg3:Int
+    arg1:Int,
+    arg2:Int,
+    arg3:Int
 };

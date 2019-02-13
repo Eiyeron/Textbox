@@ -13,53 +13,53 @@ import flixel.FlxGame;
  */
 class TestMain
 {
-	static function main()
-	{
-		// Setting back trace() for html5
-		new TestMain();
-	}
+    static function main()
+    {
+        // Setting back trace() for html5
+        new TestMain();
+    }
 
-	public function new()
-	{
-		// OpenFL/Flixel init
-   		Lib.current.stage.addChild(new FlxGame(800, 600, null, 1, 60, 60, true));
+    public function new()
+    {
+        // OpenFL/Flixel init
+           Lib.current.stage.addChild(new FlxGame(800, 600, null, 1, 60, 60, true));
 
-   		var suites = new Array<Class<massive.munit.TestSuite>>();
-		suites.push(TestSuite);
+           var suites = new Array<Class<massive.munit.TestSuite>>();
+        suites.push(TestSuite);
 
-		#if MCOVER
-			var client = new mcover.coverage.munit.client.MCoverPrintClient();
-			var httpClient = new HTTPClient(new mcover.coverage.munit.client.MCoverSummaryReportClient());
-		#else
-			var client = new RichPrintClient();
-			var httpClient = new HTTPClient(new SummaryReportClient());
-		#end
+        #if MCOVER
+            var client = new mcover.coverage.munit.client.MCoverPrintClient();
+            var httpClient = new HTTPClient(new mcover.coverage.munit.client.MCoverSummaryReportClient());
+        #else
+            var client = new RichPrintClient();
+            var httpClient = new HTTPClient(new SummaryReportClient());
+        #end
 
-		var runner:TestRunner = new TestRunner(client);
-		runner.addResultClient(httpClient);
+        var runner:TestRunner = new TestRunner(client);
+        runner.addResultClient(httpClient);
 
-		runner.completionHandler = completionHandler;
+        runner.completionHandler = completionHandler;
 
-		runner.run(suites);
-	}
+        runner.run(suites);
+    }
 
-	/**
-	 * updates the background color and closes the current browser
-	 * for flash and html targets (useful for continous integration servers)
-	 */
-	function completionHandler(successful:Bool)
-	{
-		try
-		{
-			#if flash
-				flash.external.ExternalInterface.call("testResult", successful);
-			#elseif js
-				js.Lib.eval("testResult(" + successful + ");");
-			#elseif (neko || cpp || java || cs || python || php || hl)
-				Sys.exit(0);
-			#end
-		}
-		// if run from outside browser can get error which we can ignore
-		catch (e:Dynamic) {}
-	}
+    /**
+     * updates the background color and closes the current browser
+     * for flash and html targets (useful for continous integration servers)
+     */
+    function completionHandler(successful:Bool)
+    {
+        try
+        {
+            #if flash
+                flash.external.ExternalInterface.call("testResult", successful);
+            #elseif js
+                js.Lib.eval("testResult(" + successful + ");");
+            #elseif (neko || cpp || java || cs || python || php || hl)
+                Sys.exit(0);
+            #end
+        }
+        // if run from outside browser can get error which we can ignore
+        catch (e:Dynamic) {}
+    }
 }
