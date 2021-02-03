@@ -432,8 +432,22 @@ class Textbox extends FlxSpriteGroup {
 
             case Character(currentCharacterChar):
             {
+                // inline line returns support
+                // must be first because \n is space 
+                if (currentCharacterChar == '\n')
+                    {
+                        goToNextLine();
+                        // If we're placing a newline in the last textbox's line,
+                        // make the textbox advance by one character else it'd
+                        // be perpetually stuck on the newline.
+                        if (status == FULL)
+                        {
+                            currentCharacterIndex++;
+                        }
+                        return;
+                    }
                 // If current character is a space, let's calculate how long the next word will be.
-                if (currentCharacterChar.isSpace(0))
+                else if (currentCharacterChar.isSpace(0))
                 {
                     var nextWord:String = getNextWord(currentCharacterIndex);
                     // TODO : please don't make words too long.
@@ -446,19 +460,7 @@ class Textbox extends FlxSpriteGroup {
                         return;
                     }
                 }
-                // inline line returns support
-                else if (currentCharacterChar == '\n')
-                {
-                    goToNextLine();
-                    // If we're placing a newline in the last textbox's line,
-                    // make the textbox advance by one character else it'd
-                    // be perpetually stuck on the newline.
-                    if (status == FULL)
-                    {
-                        currentCharacterIndex++;
-                    }
-                    return;
-                }
+                
                 // Character-wrap. Shouldn't be really useful but it's still a guard.
                 else if(lines[currentLineIndex].projectWidth(currentCharacterChar) > settings.textFieldWidth)
                 {
